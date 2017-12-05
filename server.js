@@ -23,6 +23,10 @@ router.get('/conf', function(req, res) {
     res.status(200).json({ user: {dupa: 'sruasdfasdfpa'} });
 });
 
+router.post('/conf', function(req, res) {
+    res.status(200).json(req.body);
+});
+
 router.get('/index', function(req, res) {
     res.sendFile(path.join(__dirname, 'public/index.html'))
 });

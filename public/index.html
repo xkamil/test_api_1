@@ -8,7 +8,7 @@
             padding: 10px;
         }
 
-        #console {
+        #output {
             height: 50%;
             background-color: #000;
             color: #fff;
@@ -35,6 +35,10 @@
             background-color: #ff0000;
         }
 
+        .btn-warning {
+            background-color: #ff7400;
+        }
+
     </style>
 
 </head>
@@ -42,43 +46,74 @@
 
 <button id="get_users" class="btn btn-primary">get users</button>
 <button id="get_configuration" class="btn btn-primary">get configuration</button>
-<button id="clear_server" class="btn btn-primary">clear server</button>
+<button id="change_configuration" class="btn btn-warning">change configuration</button>
 
-<pre id="console"></pre>
+<p><b>Console:</b></p>
+<pre id="output" contenteditable="true"></pre>
 
+<p><b>Tips:</b></p>
+<ul>
+    <li>Blue buttons are sending GET request to server. Output is visible in console if there is any.</li>
+    <li>Orange buttons sends POST requests to server. Data to be sent is taken from console - you can edit it.</li>
+    <li>If request succeed you will se button changes color for green for short time, if request fails button change color to red.</li>
+</ul>
 </body>
 
 <script>
     var serverUrl = document.location.href.replace(/\/api.*/, '');
-    var console = $('#console');
+    var output = $('#output');
 
-    $("#get_users").click(get.bind(null, '/api/users'));
-    $("#get_configuration").click(get.bind(null, '/api/conf'));
+    $("#get_users").click(function () {
+        request($(this), '/api/users')
+    });
 
-    function get(path) {
-        var button = $(this);
+    $("#get_configuration").click(function () {
+        var newConfiguration = output.text();
+        request($(this), '/api/conf')
+    });
+
+    $("#change_configuration").click(function () {
+        var newConfiguration = output.text() || {};
+
+        request($(this), '/api/conf', newConfiguration)
+    });
+
+    function request(element, path, requestData) {
+        var defaultClass = element.attr('class');
+
+        if (requestData) {
+            try {
+                requestData = JSON.parse(requestData);
+            } catch (e) {
+                alert('Request data is not valid JSON!');
+                return;
+            }
+        }
 
         $.ajax({
             cache: false,
             url: serverUrl + path,
+            type: requestData ? 'POST' : 'GET',
+            dataType: "json",
+            data: requestData,
             success: function (data) {
                 try {
                     data = JSON.stringify(data, null, 2)
                 } catch (e) {
                 }
 
-                console.text(data);
+                output.text(data);
 
-                button.attr('class', 'btn btn-success');
+                element.attr('class', 'btn btn-success');
                 setTimeout(function () {
-                    button.attr('class', 'btn btn-primary');
+                    element.attr('class', defaultClass);
                 }, 500)
             },
             error: function (xhr, ajaxOptions, thrownError) {
-                console.text(thrownError);
-                button.attr('class', 'btn btn-danger');
+                output.text(thrownError);
+                element.attr('class', 'btn btn-danger');
                 setTimeout(function () {
-                    button.attr('class', 'btn btn-primary');
+                    element.attr('class', defaultClass);
                 }, 500)
             }
         });
