@@ -4,7 +4,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
     <style>
-
         body {
             padding: 10px;
         }
@@ -38,7 +37,6 @@
 
     </style>
 
-
 </head>
 <body>
 
@@ -54,15 +52,12 @@
     var serverUrl = document.location.href.replace(/\/api.*/, '');
     var console = $('#console');
 
-    $("#get_users").click(function () {
-        get('/api/users', $("#get_users"));
-    });
+    $("#get_users").click(get.bind(null, '/api/users'));
+    $("#get_configuration").click(get.bind(null, '/api/conf'));
 
-    $("#get_configuration").click(function () {
-        get('/api/conf', $("#get_configuration"));
-    });
+    function get(path) {
+        var button = $(this);
 
-    function get(path, button) {
         $.ajax({
             cache: false,
             url: serverUrl + path,
@@ -71,6 +66,7 @@
                     data = JSON.stringify(data, null, 2)
                 } catch (e) {
                 }
+
                 console.text(data);
 
                 button.attr('class', 'btn btn-success');
