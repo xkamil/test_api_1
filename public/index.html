@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <style>
+
+        body {
+            padding: 10px;
+        }
+
+        #console {
+            height: 50%;
+            background-color: #000;
+            color: #fff;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            color: #fff;
+            border-radius: 4px;
+            padding: 10px;
+            border-width: 0;
+        }
+
+        .btn-primary {
+            background-color: #1e90ff;
+        }
+
+        .btn-success {
+            background-color: #008000;
+        }
+
+        .btn-danger {
+            background-color: #ff0000;
+        }
+
+    </style>
+
+
+</head>
+<body>
+
+<button id="get_users" class="btn btn-primary">get users</button>
+<button id="get_configuration" class="btn btn-primary">get configuration</button>
+<button id="clear_server" class="btn btn-primary">clear server</button>
+
+<pre id="console"></pre>
+
+</body>
+
+<script>
+    var serverUrl = document.location.href.replace(/\/api.*/, '');
+    var console = $('#console');
+
+    $("#get_users").click(function () {
+        get('/api/users', $("#get_users"));
+    });
+
+    $("#get_configuration").click(function () {
+        get('/api/conf', $("#get_configuration"));
+    });
+
+    function get(path, button) {
+        $.ajax({
+            cache: false,
+            url: serverUrl + path,
+            success: function (data) {
+                try {
+                    data = JSON.stringify(data, null, 2)
+                } catch (e) {
+                }
+                console.text(data);
+
+                button.attr('class', 'btn btn-success');
+                setTimeout(function () {
+                    button.attr('class', 'btn btn-primary');
+                }, 500)
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                console.text(thrownError);
+                button.attr('class', 'btn btn-danger');
+                setTimeout(function () {
+                    button.attr('class', 'btn btn-primary');
+                }, 500)
+            }
+        });
+    }
+
+</script>
+</html>
